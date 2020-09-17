@@ -36,6 +36,8 @@ setup(
         "pytest-aiohttp",
         "pytest-cov",
         "pytest-mock",
+        "pytest-dotenv",
+        "python-dotenv",
         "pytest",
         "requests"
     ],

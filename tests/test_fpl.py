@@ -1,5 +1,6 @@
 import aiohttp
 import pytest
+import os
 
 from fpl import FPL
 from fpl.models.classic_league import ClassicLeague
@@ -230,10 +231,10 @@ class TestFPL(object):
 
     async def test_h2h_league(self, loop, fpl):
         await fpl.login()
-        h2h_league = await fpl.get_h2h_league(902521)
+        h2h_league = await fpl.get_h2h_league(os.environ.get('H2H_LEAGUE'))
         assert isinstance(h2h_league, H2HLeague)
 
-        h2h_league = await fpl.get_h2h_league(902521, True)
+        h2h_league = await fpl.get_h2h_league(os.environ.get('H2H_LEAGUE'), True)
         assert isinstance(h2h_league, dict)
 
     async def test_login_with_no_email_password(

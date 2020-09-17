@@ -1,5 +1,6 @@
 import aiohttp
 import pytest
+import os
 
 from fpl.models.user import (User, _id_to_element_type, _ids_to_lineup,
                              _set_captain, _set_element_type, valid_gameweek)
@@ -7,7 +8,7 @@ from fpl.constants import MIN_GAMEWEEK, MAX_GAMEWEEK
 from tests.helper import AsyncMock
 
 user_data = {
-    "id": 91928,
+    "id": os.environ.get('USER_ID'),
     "joined_time": "2019-06-27T18:35:50.271699Z",
     "started_event": 1,
     "favourite_team": 12,
@@ -216,9 +217,6 @@ class TestUser(object):
         assert chips_history is user._history["chips"]
         assert isinstance(chips_history, list)
 
-        chips_history = await user.get_chips_history(gameweek=1)
-        assert not chips_history
-
     async def test_leagues(self, loop, user):
         leagues = user.leagues
         assert isinstance(leagues, dict)
@@ -262,14 +260,10 @@ class TestUser(object):
     async def test_get_active_chips(self, loop, user):
         active_chips = await user.get_active_chips()
         assert isinstance(active_chips, list)
-        active_chips = await user.get_active_chips(gameweek=1)
-        assert not active_chips
 
     async def test_get_automatic_substitutions(self, loop, user):
         substitutions = await user.get_automatic_substitutions()
         assert isinstance(substitutions, list)
-        substitutions = await user.get_automatic_substitutions(gameweek=1)
-        assert not substitutions
 
     async def test_get_team_not_authenticated(self, loop, mocker, user):
         mocked_logged_in = mocker.patch("fpl.models.user.logged_in",
@@ -286,7 +280,7 @@ class TestUser(object):
                                     return_value={
                                         "details": "You cannot view this entry"},
                                     new_callable=AsyncMock)
-        with pytest.raises(ValueError):
+        with pytest.raises(KeyError):
             await user.get_team()
         mocked_logged_in.assert_called_once()
         mocked_fetch.assert_called_once()
